@@ -1,3 +1,4 @@
+import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { UserModel } from './../user/user.model';
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { ModelType } from '@typegoose/typegoose/lib/types';
@@ -22,6 +23,23 @@ export class AuthService {
       ...tokens,
     }
   }
+  async getNewTokens({refreshToken}:RefreshTokenDto) {
+    if(!refreshToken) throw new UnauthorizedException("Please sign in!")
+
+    const result = await this.jwtService.verifyAsync(refreshToken)
+
+    if(!result)  throw new UnauthorizedException('Invalid token or expired!')
+    
+    const user = await this.UserModel.findById(result._id)
+  
+    const tokens = await this.issueTokenPair(String(user._id))
+
+    return {
+      user: this.returnUserFields(user),
+      ...tokens,
+    }
+  }
+  
   
   async register(dto: AuthDto){
     const oldUser = await this.UserModel.findOne({email: dto.email})
