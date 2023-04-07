@@ -3,7 +3,10 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModel } from 'src/user/user.model';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { getJWTConfig } from 'src/config/jwt.congig';
+import { JwtStrategy } from './strategies/jwt.stratgy';
 
 @Module({
   providers: [AuthService],
@@ -16,8 +19,13 @@ import { ConfigModule } from '@nestjs/config';
         }
       }
     ]),
-    ConfigModule
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: getJWTConfig
+    })
   ],
-  controllers: [AuthController]
+  controllers: [AuthController, JwtStrategy],
 })
 export class AuthModule {}
