@@ -54,6 +54,7 @@ export class UserController {
 	}
 
 	@Delete(':id')
+	@HttpCode(200)
 	@Auth('admin')
 	async delete(@Param('id', IdValidationPipe) id: string) {
 		return this.userService.delete(id)
