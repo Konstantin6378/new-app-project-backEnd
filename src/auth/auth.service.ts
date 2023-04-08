@@ -57,6 +57,15 @@ export class AuthService {
 			email: dto.email,
 			password: await hash(dto.password, salt),
 		})
+
+		const user = await newUser.save()
+
+		const tokens = await this.issueTokenPair(String(user._id))
+
+		return {
+			user: this.returnUserFields(user),
+			...tokens,
+		}
 	}
 
 	async validateUser(dto: AuthDto): Promise<UserModel> {
