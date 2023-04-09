@@ -6,6 +6,7 @@ import {
 	Delete,
 	Get,
 	HttpCode,
+	NotFoundException,
 	Param,
 	Post,
 	Put,
@@ -28,6 +29,11 @@ export class GenreController {
 	@Get()
 	async getAll(@Query('searchTerm') searchTerm?: string) {
 		return this.genreService.getAll(searchTerm)
+	}
+
+	@Get('/popular')
+	async getPopular() {
+		return this.genreService.getPopular()
 	}
 
 	@Get('/collections')
@@ -57,12 +63,15 @@ export class GenreController {
 		@Param('id', IdValidationPipe) id: string,
 		@Body() dto: CreateGenreDto
 	) {
-		return this.genreService.update(id, dto)
+		const updateGenre = await this.genreService.update(id, dto)
+		if (!updateGenre) throw new NotFoundException('Genre not found')
+		return updateGenre
 	}
 
 	@Delete(':id')
 	@Auth('admin')
 	async delete(@Param('id', IdValidationPipe) id: string) {
-		return this.genreService.delete(id)
+		const deletedDoc = await this.genreService.delete(id)
+		if (!deletedDoc) throw new NotFoundException('Genre not found')
 	}
 }

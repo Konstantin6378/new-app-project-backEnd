@@ -9,6 +9,7 @@ import {
 import { FileService } from './file.service'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { FileResponse } from './file.interface'
 
 @Controller('files')
 export class FileController {
@@ -21,7 +22,7 @@ export class FileController {
 	async uploadFile(
 		@UploadedFile() file: Express.Multer.File,
 		@Query('folder') folder?: string
-	) {
+	): Promise<FileResponse[]> {
 		return this.fileService.saveFiles([file], folder)
 	}
 }

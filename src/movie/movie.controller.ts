@@ -7,6 +7,7 @@ import {
 	Delete,
 	Get,
 	HttpCode,
+	NotFoundException,
 	Param,
 	Post,
 	Put,
@@ -15,8 +16,7 @@ import {
 	ValidationPipe,
 } from '@nestjs/common'
 import { MovieService } from './movie.service'
-import { UpdateMovieDto } from './update-movie.dto'
-import { GenreIdsDto } from './dto/genreIds.dto'
+import { UpdateMovieDto } from './dto/update-movie.dto'
 
 @Controller('movies')
 export class MovieController {
@@ -31,11 +31,12 @@ export class MovieController {
 	async byActorId(@Param('actorId', IdValidationPipe) actorId: Types.ObjectId) {
 		return this.movieService.byActor(actorId)
 	}
-
-	@UsePipes(new ValidationPipe())
 	@Post('by-genres')
 	@HttpCode(200)
-	async byGenres(@Body() { genreIds }: GenreIdsDto) {
+	async byGenres(
+		@Body('genreIds')
+		genreIds: Types.ObjectId[]
+	) {
 		return this.movieService.byGenres(genreIds)
 	}
 
@@ -44,12 +45,12 @@ export class MovieController {
 		return this.movieService.getAll(searchTerm)
 	}
 
-	@Get('most-popular')
+	@Get('/most-popular')
 	async getMostPopular() {
 		return this.movieService.getMostPopular()
 	}
 
-	@Post('update-count-opened')
+	@Post('/update-count-opened')
 	@HttpCode(200)
 	async updateCountOpened(@Body('slug') slug: string) {
 		return this.movieService.updateCountOpened(slug)
@@ -77,12 +78,15 @@ export class MovieController {
 		@Param('id', IdValidationPipe) id: string,
 		@Body() dto: UpdateMovieDto
 	) {
-		return this.movieService.update(id, dto)
+		const updateMovie = await this.movieService.update(id, dto)
+		if (!updateMovie) throw new NotFoundException('Movie not found')
+		return updateMovie
 	}
 
 	@Delete(':id')
 	@Auth('admin')
 	async delete(@Param('id', IdValidationPipe) id: string) {
-		return this.movieService.delete(id)
+		const deletedDoc = await this.movieService.delete(id)
+		if (!deletedDoc) throw new NotFoundException('Movie not found')
 	}
 }

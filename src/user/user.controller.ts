@@ -43,7 +43,6 @@ export class UserController {
 		return this.userService.getFavoriteMovies(_id)
 	}
 
-	// @UsePipes(new ValidationPipe())
 	@Put('profile/favorites')
 	@HttpCode(200)
 	@Auth()
@@ -66,10 +65,10 @@ export class UserController {
 		return this.userService.getAll(searchTerm)
 	}
 
-	@Delete(':id')
+	@Get(':id')
 	@Auth('admin')
-	async delete(@Param('id', IdValidationPipe) id: string) {
-		return this.userService.delete(id)
+	async getUser(@Param('id', IdValidationPipe) id: string) {
+		return this.userService.byId(id)
 	}
 
 	@UsePipes(new ValidationPipe())
@@ -83,9 +82,10 @@ export class UserController {
 		return this.userService.updateProfile(id, dto)
 	}
 
-	// @Get(':id')
-	// @Auth('admin')
-	// async getUser(@Param('id', IdValidationPipe) id: string) {
-	// 	return this.userService.byId(id)
-	// }
+	@Delete(':id')
+	@Auth('admin')
+	async delete(@Param('id', IdValidationPipe) id: string) {
+		const deletedDoc = await this.userService.delete(id)
+		if (!deletedDoc) throw new NotFoundException('Movie not found')
+	}
 }

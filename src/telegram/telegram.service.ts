@@ -29,14 +29,8 @@ export class TelegramService {
 		msg?: string,
 		chatId: string = this.options.chatId
 	) {
-		await this.bot.telegram.sendPhoto(
-			chatId,
-			photo,
-			msg
-				? {
-						caption: msg,
-				  }
-				: {}
-		)
+		await this.bot.telegram.sendPhoto(chatId, photo, {
+			caption: msg,
+		})
 	}
 }
