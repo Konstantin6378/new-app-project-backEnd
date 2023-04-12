@@ -47,6 +47,6 @@ export class MovieModel extends TimeStamps {
 	@prop({ unique: true })
 	slug: string
 
-	@prop({ default: false })
-	isSendTelegram?: boolean
+	// @prop({ default: false })
+	// isSendTelegram?: boolean
 }

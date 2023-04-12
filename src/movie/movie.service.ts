@@ -1,4 +1,4 @@
-import { TelegramService } from './../telegram/telegram.service'
+// import { TelegramService } from './../telegram/telegram.service'
 import { MovieModel } from './movie.model'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
@@ -9,9 +9,9 @@ import { Types } from 'mongoose'
 @Injectable()
 export class MovieService {
 	constructor(
-		@InjectModel(MovieModel) private readonly MovieModel: ModelType<MovieModel>,
-		private readonly telegramService: TelegramService
-	) {}
+		@InjectModel(MovieModel) private readonly MovieModel: ModelType<MovieModel>
+	) // private readonly telegramService: TelegramService
+	{}
 
 	async getAll(searchTerm?: string): Promise<DocumentType<MovieModel>[]> {
 		let options = {}
@@ -99,10 +99,10 @@ export class MovieService {
 		_id: string,
 		dto: UpdateMovieDto
 	): Promise<DocumentType<MovieModel> | null> {
-		if (!dto.isSendTelegram) {
-			await this.sendNotifications(dto)
-			dto.isSendTelegram = true
-		}
+		// if (!dto.isSendTelegram) {
+		// 	await this.sendNotifications(dto)
+		// 	dto.isSendTelegram = true
+		// }
 
 		const updateDoc = await this.MovieModel.findByIdAndUpdate(_id, dto, {
 			new: true,
@@ -137,23 +137,23 @@ export class MovieService {
 		).exec()
 	}
 
-	async sendNotifications(dto: UpdateMovieDto) {
-		if (process.env.NODE_ENV !== 'development')
-			await this.telegramService.sendPhoto(dto.poster)
+	// async sendNotifications(dto: UpdateMovieDto) {
+	// 	if (process.env.NODE_ENV !== 'development')
+	// 		await this.telegramService.sendPhoto(dto.poster)
 
-		const msg = `<b>${dto.title}</b>\n\n` + `${dto.description}\n\n`
+	// 	const msg = `<b>${dto.title}</b>\n\n` + `${dto.description}\n\n`
 
-		await this.telegramService.sendMessage(msg, {
-			reply_markup: {
-				inline_keyboard: [
-					[
-						{
-							url: 'https://okko.tv/movie/free-guy',
-							text: '🍿🍿🍿 Go to watch',
-						},
-					],
-				],
-			},
-		})
-	}
+	// 	await this.telegramService.sendMessage(msg, {
+	// 		reply_markup: {
+	// 			inline_keyboard: [
+	// 				[
+	// 					{
+	// 						url: 'https://okko.tv/movie/free-guy',
+	// 						text: '🍿🍿🍿 Go to watch',
+	// 					},
+	// 				],
+	// 			],
+	// 		},
+	// 	})
+	// }
 }

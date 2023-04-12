@@ -1,4 +1,4 @@
-export interface ITelegramOptions {
-	chatId: string
-	token: string
-}
+// export interface ITelegramOptions {
+// 	chatId: string
+// 	token: string
+// }

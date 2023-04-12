@@ -1,6 +1,6 @@
 import {
 	IsArray,
-	IsBoolean,
+	// IsBoolean,
 	IsNumber,
 	IsObject,
 	IsString,
@@ -47,6 +47,6 @@ export class UpdateMovieDto {
 	@IsString()
 	slug: string
 
-	@IsBoolean()
-	isSendTelegram?: boolean
+	// @IsBoolean()
+	// isSendTelegram?: boolean
 }
