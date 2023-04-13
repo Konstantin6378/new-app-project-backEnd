@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common'
 import { MovieService } from './movie.service'
 import { UpdateMovieDto } from './dto/update-movie.dto'
+import { GenreIdsDto } from './dto/genrelds.dto'
 
 @Controller('movies')
 export class MovieController {
@@ -31,11 +32,13 @@ export class MovieController {
 	async byActorId(@Param('actorId', IdValidationPipe) actorId: Types.ObjectId) {
 		return this.movieService.byActor(actorId)
 	}
+
+	@UsePipes(new ValidationPipe())
 	@Post('by-genres')
 	@HttpCode(200)
 	async byGenres(
-		@Body('genreIds')
-		genreIds: Types.ObjectId[]
+		@Body()
+		{ genreIds }: GenreIdsDto
 	) {
 		return this.movieService.byGenres(genreIds)
 	}
@@ -45,12 +48,12 @@ export class MovieController {
 		return this.movieService.getAll(searchTerm)
 	}
 
-	@Get('/most-popular')
+	@Get('most-popular')
 	async getMostPopular() {
 		return this.movieService.getMostPopular()
 	}
 
-	@Post('/update-count-opened')
+	@Put('update-count-opened')
 	@HttpCode(200)
 	async updateCountOpened(@Body('slug') slug: string) {
 		return this.movieService.updateCountOpened(slug)

@@ -9,9 +9,8 @@ import { Types } from 'mongoose'
 @Injectable()
 export class MovieService {
 	constructor(
-		@InjectModel(MovieModel) private readonly MovieModel: ModelType<MovieModel>
-	) // private readonly telegramService: TelegramService
-	{}
+		@InjectModel(MovieModel) private readonly MovieModel: ModelType<MovieModel> // private readonly telegramService: TelegramService
+	) {}
 
 	async getAll(searchTerm?: string): Promise<DocumentType<MovieModel>[]> {
 		let options = {}
@@ -57,6 +56,13 @@ export class MovieService {
 		return docs
 	}
 
+	async getMostPopular(): Promise<DocumentType<MovieModel>[]> {
+		return this.MovieModel.find({ countOpened: { $gt: 0 } })
+			.sort({ countOpened: -1 })
+			.populate('genres')
+			.exec()
+	}
+
 	async updateCountOpened(slug: string) {
 		const updateDoc = await this.MovieModel.findOneAndUpdate(
 			{ slug },
@@ -85,7 +91,7 @@ export class MovieService {
 			bigPoster: '',
 			actors: [],
 			genres: [],
-			description: '',
+			// description: '',
 			poster: '',
 			title: '',
 			videoUrl: '',
@@ -107,7 +113,7 @@ export class MovieService {
 		const updateDoc = await this.MovieModel.findByIdAndUpdate(_id, dto, {
 			new: true,
 		}).exec()
-		if (!updateDoc) throw new NotFoundException('Actor not found!')
+		if (!updateDoc) throw new NotFoundException('Movie not found!')
 		return updateDoc
 	}
 
@@ -116,13 +122,6 @@ export class MovieService {
 
 		if (!deleteMovie) throw new NotFoundException('Movie not found!')
 		return deleteMovie
-	}
-
-	async getMostPopular(): Promise<DocumentType<MovieModel>[]> {
-		return this.MovieModel.find({ countOpened: { $gt: 0 } })
-			.sort({ countOpened: -1 })
-			.populate('genres')
-			.exec()
 	}
 
 	async updateRating(id: Types.ObjectId, newRating: number) {

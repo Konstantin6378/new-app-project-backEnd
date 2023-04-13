@@ -27,8 +27,8 @@ export class UpdateMovieDto {
 	@IsString()
 	title: string
 
-	@IsString()
-	description: string
+	// @IsString()
+	// description: string
 
 	@IsObject()
 	parameters?: Parameter
