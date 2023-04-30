@@ -88,7 +88,7 @@ export class MovieService {
 
 	async create(): Promise<Types.ObjectId> {
 		const defaultValue: UpdateMovieDto = {
-			bigPoster: '',
+			bigPoster: ' ',
 			actors: [],
 			genres: [],
 			// description: '',
