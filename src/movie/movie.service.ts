@@ -9,7 +9,7 @@ import { Types } from 'mongoose'
 @Injectable()
 export class MovieService {
 	constructor(
-		@InjectModel(MovieModel) private readonly MovieModel: ModelType<MovieModel> // private readonly telegramService: TelegramService
+		@InjectModel(MovieModel) private readonly movieModel: ModelType<MovieModel> // private readonly telegramService: TelegramService
 	) {}
 
 	async getAll(searchTerm?: string): Promise<DocumentType<MovieModel>[]> {
@@ -25,7 +25,8 @@ export class MovieService {
 			}
 		}
 
-		return this.MovieModel.find(options)
+		return this.movieModel
+			.find(options)
 			.select(' -updatedAt -__v')
 			.sort({ createdAt: 'desc' })
 			.populate('actors genres')
@@ -33,7 +34,8 @@ export class MovieService {
 	}
 
 	async bySlug(slug: string): Promise<DocumentType<MovieModel>> {
-		const doc = await this.MovieModel.findOne({ slug })
+		const doc = await this.movieModel
+			.findOne({ slug })
 			.populate('actors genres')
 			.exec()
 		if (!doc) throw new NotFoundException('Movie not found!')
@@ -41,7 +43,7 @@ export class MovieService {
 	}
 
 	async byActor(actorId: Types.ObjectId): Promise<DocumentType<MovieModel>[]> {
-		const docs = await this.MovieModel.find({ actors: actorId }).exec()
+		const docs = await this.movieModel.find({ actors: actorId }).exec()
 		if (!docs) throw new NotFoundException('Movies not found!')
 		return docs
 	}
@@ -49,30 +51,35 @@ export class MovieService {
 	async byGenres(
 		genreIds: Types.ObjectId[]
 	): Promise<DocumentType<MovieModel>[]> {
-		const docs = await this.MovieModel.find({
-			genres: { $in: genreIds },
-		}).exec()
+		const docs = await this.movieModel
+			.find({
+				genres: { $in: genreIds },
+			})
+			.exec()
 		if (!docs) throw new NotFoundException('Movies not found!')
 		return docs
 	}
 
 	async getMostPopular(): Promise<DocumentType<MovieModel>[]> {
-		return this.MovieModel.find({ countOpened: { $gt: 0 } })
+		return this.movieModel
+			.find({ countOpened: { $gt: 0 } })
 			.sort({ countOpened: -1 })
 			.populate('genres')
 			.exec()
 	}
 
 	async updateCountOpened(slug: string) {
-		const updateDoc = await this.MovieModel.findOneAndUpdate(
-			{ slug },
-			{
-				$inc: { countOpened: 1 },
-			},
-			{
-				new: true,
-			}
-		).exec()
+		const updateDoc = await this.movieModel
+			.findOneAndUpdate(
+				{ slug },
+				{
+					$inc: { countOpened: 1 },
+				},
+				{
+					new: true,
+				}
+			)
+			.exec()
 		if (!updateDoc) throw new NotFoundException('Movie not found!')
 		return updateDoc
 	}
@@ -80,7 +87,7 @@ export class MovieService {
 	// !Admin place
 
 	async byId(_id: string): Promise<DocumentType<MovieModel>> {
-		const doc = await this.MovieModel.findById(_id)
+		const doc = await this.movieModel.findById(_id)
 		if (!doc) throw new NotFoundException('Movie not found!')
 
 		return doc
@@ -97,7 +104,7 @@ export class MovieService {
 			videoUrl: '',
 			slug: '',
 		}
-		const movie = await this.MovieModel.create(defaultValue)
+		const movie = await this.movieModel.create(defaultValue)
 		return movie._id
 	}
 
@@ -110,30 +117,34 @@ export class MovieService {
 		// 	dto.isSendTelegram = true
 		// }
 
-		const updateDoc = await this.MovieModel.findByIdAndUpdate(_id, dto, {
-			new: true,
-		}).exec()
+		const updateDoc = await this.movieModel
+			.findByIdAndUpdate(_id, dto, {
+				new: true,
+			})
+			.exec()
 		if (!updateDoc) throw new NotFoundException('Movie not found!')
 		return updateDoc
 	}
 
 	async delete(id: string): Promise<DocumentType<MovieModel> | null> {
-		const deleteMovie = await this.MovieModel.findByIdAndDelete(id).exec()
+		const deleteMovie = await this.movieModel.findByIdAndDelete(id).exec()
 
 		if (!deleteMovie) throw new NotFoundException('Movie not found!')
 		return deleteMovie
 	}
 
 	async updateRating(id: Types.ObjectId, newRating: number) {
-		return this.MovieModel.findByIdAndUpdate(
-			id,
-			{
-				rating: newRating,
-			},
-			{
-				new: true,
-			}
-		).exec()
+		return this.movieModel
+			.findByIdAndUpdate(
+				id,
+				{
+					rating: newRating,
+				},
+				{
+					new: true,
+				}
+			)
+			.exec()
 	}
 
 	// async sendNotifications(dto: UpdateMovieDto) {
